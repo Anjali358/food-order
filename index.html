@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieExpress - Order Delicious Food</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .cart-bounce { animation: bounce 0.3s ease-in-out; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="text-2xl font-bold text-orange-600">🍕 FoodieExpress</div>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="showSection('menu')" class="nav-btn text-gray-700 hover:text-orange-600 font-medium">Menu</button>
+                    <button onclick="showSection('about')" class="nav-btn text-gray-700 hover:text-orange-600 font-medium">About</button>
+                    <button onclick="showSection('contact')" class="nav-btn text-gray-700 hover:text-orange-600 font-medium">Contact</button>
+                </nav>
+                <button onclick="showSection('cart')" class="relative bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                    🛒 Cart (<span id="cart-count">0</span>)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="bg-gradient-to-r from-orange-500 to-red-500 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl font-bold mb-6">Delicious Food Delivered Fast</h1>
+            <p class="text-xl mb-8 opacity-90">Fresh ingredients, amazing flavors, delivered to your doorstep in 30 minutes</p>
+            <button onclick="showSection('menu')" class="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
+                Order Now
+            </button>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-16 hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Our Menu</h2>
+            
+            <!-- Category Filters -->
+            <div class="flex justify-center mb-8 space-x-4 flex-wrap">
+                <button onclick="filterMenu('all')" class="filter-btn bg-orange-600 text-white px-6 py-2 rounded-full font-medium hover:bg-orange-700 transition-colors">All</button>
+                <button onclick="filterMenu('pizza')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors">Pizza</button>
+                <button onclick="filterMenu('burger')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors">Burgers</button>
+                <button onclick="filterMenu('pasta')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors">Pasta</button>
+                <button onclick="filterMenu('dessert')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition-colors">Desserts</button>
+            </div>
+
+            <!-- Menu Items Grid -->
+            <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart" class="py-16 hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold mb-8">Your Cart</h2>
+            <div id="cart-items" class="space-y-4 mb-8">
+                <!-- Cart items will be populated by JavaScript -->
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center text-xl font-bold mb-4">
+                    <span>Total: $<span id="cart-total">0.00</span></span>
+                </div>
+                <button onclick="showSection('checkout')" id="checkout-btn" class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors disabled:bg-gray-400" disabled>
+                    Proceed to Checkout
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkout Section -->
+    <section id="checkout" class="py-16 hidden">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold mb-8">Checkout</h2>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <form id="checkout-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
+                        <textarea required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option>Cash on Delivery</option>
+                            <option>Demo Payment (Sample)</option>
+                        </select>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center text-lg font-semibold">
+                            <span>Order Total: $<span id="checkout-total">0.00</span></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                        Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-8">About FoodieExpress</h2>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <p class="text-lg text-gray-700 mb-6">We're passionate about delivering fresh, delicious food right to your doorstep. Our chefs use only the finest ingredients to create memorable dining experiences.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">⚡</div>
+                        <h3 class="font-semibold mb-2">Fast Delivery</h3>
+                        <p class="text-gray-600">30 minutes or less</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🌟</div>
+                        <h3 class="font-semibold mb-2">Quality Food</h3>
+                        <p class="text-gray-600">Fresh ingredients daily</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">💯</div>
+                        <h3 class="font-semibold mb-2">Satisfaction</h3>
+                        <p class="text-gray-600">100% guaranteed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 hidden">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-semibold mb-4">📍 Address</h3>
+                        <p class="text-gray-700">123 Food Street<br>Delicious City, DC 12345</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-4">📞 Phone</h3>
+                        <p class="text-gray-700">(555) 123-FOOD<br>Available 24/7</p>
+                    </div>
+                </div>
+                <form class="space-y-4">
+                    <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    <textarea placeholder="Your Message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"></textarea>
+                    <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition-colors">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Confirmation Modal -->
+    <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg max-w-md mx-4 text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h3 class="text-2xl font-bold mb-4">Order Placed Successfully!</h3>
+            <p class="text-gray-700 mb-6">Your delicious food will be delivered in 25-30 minutes.</p>
+            <p class="text-sm text-gray-600 mb-6">Order ID: #<span id="order-id"></span></p>
+            <button onclick="closeOrderModal()" class="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Menu data
+        const menuItems = [
+            { id: 1, name: "Margherita Pizza", category: "pizza", price: 14.99, description: "Fresh tomatoes, mozzarella, basil", emoji: "🍕" },
+            { id: 2, name: "Pepperoni Pizza", category: "pizza", price: 16.99, description: "Pepperoni, mozzarella, tomato sauce", emoji: "🍕" },
+            { id: 3, name: "Classic Burger", category: "burger", price: 12.99, description: "Beef patty, lettuce, tomato, cheese", emoji: "🍔" },
+            { id: 4, name: "Chicken Burger", category: "burger", price: 13.99, description: "Grilled chicken, avocado, mayo", emoji: "🍔" },
+            { id: 5, name: "Spaghetti Carbonara", category: "pasta", price: 15.99, description: "Creamy sauce, bacon, parmesan", emoji: "🍝" },
+            { id: 6, name: "Penne Arrabbiata", category: "pasta", price: 14.99, description: "Spicy tomato sauce, garlic, herbs", emoji: "🍝" },
+            { id: 7, name: "Chocolate Cake", category: "dessert", price: 6.99, description: "Rich chocolate layer cake", emoji: "🍰" },
+            { id: 8, name: "Tiramisu", category: "dessert", price: 7.99, description: "Classic Italian dessert", emoji: "🍰" }
+        ];
+
+        let cart = [];
+        let currentSection = 'hero';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMenu();
+            updateCartDisplay();
+        });
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(section).classList.remove('hidden');
+            document.getElementById(section).classList.add('fade-in');
+            
+            currentSection = section;
+
+            // Update navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-orange-600');
+                btn.classList.add('text-gray-700');
+            });
+
+            if (section === 'checkout') {
+                updateCheckoutTotal();
+            }
+        }
+
+        // Menu functions
+        function renderMenu(filter = 'all') {
+            const grid = document.getElementById('menu-grid');
+            const filteredItems = filter === 'all' ? menuItems : menuItems.filter(item => item.category === filter);
+            
+            grid.innerHTML = filteredItems.map(item => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="text-4xl mb-4 text-center">${item.emoji}</div>
+                        <h3 class="text-xl font-semibold mb-2">${item.name}</h3>
+                        <p class="text-gray-600 mb-4">${item.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-orange-600">$${item.price}</span>
+                            <button onclick="addToCart(${item.id})" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMenu(category) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-orange-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-orange-600', 'text-white');
+            
+            renderMenu(category);
+        }
+
+        // Cart functions
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            const existingItem = cart.find(i => i.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            
+            // Add bounce animation to cart button
+            const cartBtn = document.querySelector('header button[onclick="showSection(\'cart\')"]');
+            cartBtn.classList.add('cart-bounce');
+            setTimeout(() => cartBtn.classList.remove('cart-bounce'), 300);
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+        }
+
+        function updateQuantity(itemId, change) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = totalPrice.toFixed(2);
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="text-center py-8 text-gray-500">Your cart is empty</div>';
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl">${item.emoji}</span>
+                            <div>
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-gray-600">$${item.price} each</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-200 text-gray-700 w-8 h-8 rounded-full hover:bg-gray-300">-</button>
+                            <span class="font-semibold">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="bg-gray-200 text-gray-700 w-8 h-8 rounded-full hover:bg-gray-300">+</button>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-600 hover:text-red-800 ml-4">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateCheckoutTotal() {
+            const checkoutTotal = document.getElementById('checkout-total');
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            checkoutTotal.textContent = totalPrice.toFixed(2);
+        }
+
+        // Checkout
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate order ID
+            const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
+            document.getElementById('order-id').textContent = orderId;
+            
+            // Show confirmation modal
+            document.getElementById('order-modal').classList.remove('hidden');
+            document.getElementById('order-modal').classList.add('flex');
+            
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+        });
+
+        function closeOrderModal() {
+            document.getElementById('order-modal').classList.add('hidden');
+            document.getElementById('order-modal').classList.remove('flex');
+            showSection('menu');
+        }
+
+        // Contact form
+        document.querySelector('#contact form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you soon.');
+            this.reset();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c70ed3938f8b82',t:'MTc1NzQyNDgxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
